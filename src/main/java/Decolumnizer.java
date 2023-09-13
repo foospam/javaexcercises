@@ -11,17 +11,27 @@ public class Decolumnizer {
                 honest ones you want stupid.
                 """;
 
-
-        System.out.println(findColumnSeparator(text));
+        System.out.println(decolumnize(text));
 
     }
 
     public static String decolumnize(String s){
 
-        String result = "";
+        String left = "";
+        String right = "";
 
+        String[] strings = s.split("\n");
+        int separator = findColumnSeparator(s);
 
-        return result;
+        for (int i = 0; i < strings.length; i++) {
+            String leftColumn = strings[i].substring(0, separator);
+            String righColumn = strings[i].substring(separator+1);
+
+            left += !leftColumn.isBlank() ? cleanLines(leftColumn) : "";
+            right += !righColumn.isBlank() ? cleanLines(righColumn) : "";
+        }
+
+        return left+right;
     }
 
     public static int findColumnSeparator(String string) {
@@ -57,14 +67,9 @@ public class Decolumnizer {
         }
     }
 
-
-
-    public static int findLongestLine(String[] strings){
-        int maxLength = 0;
-        for (String string : strings) {
-            if (maxLength < string.length()) maxLength = string.length();
-
-        }
-        return maxLength;
+    private static String cleanLines(String line){
+        line = line.strip();
+        line += "\n";
+        return line;
     }
 }
