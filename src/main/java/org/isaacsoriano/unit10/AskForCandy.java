@@ -1,20 +1,16 @@
 package org.isaacsoriano.unit10;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Optional;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class AskForCandy {
     public static void main(String[] args) {
         CandyType candy = CandyType.fromName("Licorice").get();
         System.out.println(candy.addictiveQuality());
-        System.out.println(CandyType.CHEWING_GUMS.next());
+        System.out.println(CandyType.LOLLIPOPS.next());
         // NOTA: Arreglar esto, que simplemente me está devolviendo el siguiente de la lista
 
     }
-
-
-
 }
 
 enum CandyType {
@@ -33,6 +29,8 @@ enum CandyType {
         };
     }
 
+    private static final Map<Integer, ArrayList<CandyType>> addictionMap = new HashMap<Integer, ArrayList<CandyType>>();
+
     private static final Comparator<CandyType> CompareByAddictiveQuality =
             new Comparator<CandyType>() {
                 @Override
@@ -45,21 +43,41 @@ enum CandyType {
         return next(this.name());
     }
 
-    private static CandyType next(String candyName){
-        ArrayList<CandyType> candyList = new ArrayList<CandyType>();
-        for (CandyType candy : CandyType.values()) {
-            candyList.add(CandyType.fromName(candy.name()).get());
-        }
-
-        candyList.sort(CompareByAddictiveQuality);
-        for (int i = 0; i < candyList.size(); i++) {
-            if (candyList.get(i).name().equals(candyName)) {
-                if (i < candyList.size() -1) return candyList.get(i+1);
-                else return candyList.get(i);
+    private static void fillAddictionMap(){
+        for (CandyType candy : CandyType.values()){
+            Integer addiction = candy.addictiveQuality();
+            if (!addictionMap.containsKey(addiction))
+            {
+                ArrayList<CandyType> newList = new ArrayList<>();
+                newList.add(candy);
+                addictionMap.put(addiction, newList);
+            }
+            else {
+                ArrayList<CandyType> oldList = addictionMap.get(addiction);
+                oldList.add(candy);
             }
         }
+    }
 
-        return CandyType.fromName(candyName).get();
+    private static CandyType next(String candyName){
+        if (addictionMap.isEmpty()) fillAddictionMap();
+
+        int thisAddiction = CandyType.fromName(candyName).get().addictiveQuality();
+        ArrayList<Integer> addictionValues = new ArrayList<Integer>();
+        addictionValues.addAll(addictionMap.keySet());
+        addictionValues.sort(new Comparator<Integer>(){
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return Integer.compare(o1, o2);
+            }
+        });
+        int thisAddictionIndex =addictionValues.indexOf(thisAddiction);
+        if (thisAddictionIndex == addictionValues.size()-1)
+            return CandyType.fromName(candyName).get();
+        else {
+            ArrayList<CandyType> resultArray = addictionMap.get(addictionValues.get(thisAddictionIndex + 1));
+            return resultArray.get((int) (Math.random() * resultArray.size()));
+        }
     }
 
     int addictiveQuality(){
@@ -75,4 +93,6 @@ enum CandyType {
     }
 }
 
+
+// FRAGE AN CHRISTIAN: IST DAS ZU KOMPLIZIERT?
 
