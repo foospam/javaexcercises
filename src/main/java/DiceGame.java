@@ -10,6 +10,7 @@ public class DiceGame {
     }
 
     private static int[] shuffleDice() {
+
         int[] dice = new int[5];
         for (int i = 0; i < 5; i++) {
             dice[i] = (int) (Math.random() * 6) + 1;
